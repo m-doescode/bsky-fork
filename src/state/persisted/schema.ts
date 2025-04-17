@@ -131,6 +131,7 @@ const schema = z.object({
   noAppLabelers: z.boolean().optional(),
   noDiscoverFallback: z.boolean().optional(),
   repostCarouselEnabled: z.boolean().optional(),
+  hideFollowNotifications: z.boolean().optional(),
 
   /** @deprecated */
   mutedThreads: z.array(z.string()),

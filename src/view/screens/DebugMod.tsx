@@ -22,6 +22,7 @@ import {useLingui} from '@lingui/react'
 
 import {useGlobalLabelStrings} from '#/lib/moderation/useGlobalLabelStrings'
 import {CommonNavigatorParams, NativeStackScreenProps} from '#/lib/routes/types'
+import {useHideFollowNotifications} from '#/state/preferences/hide-follow-notifications'
 import {moderationOptsOverrideContext} from '#/state/preferences/moderation-opts'
 import {FeedNotification} from '#/state/queries/notifications/types'
 import {
@@ -866,7 +867,14 @@ function MockNotifItem({
   moderationOpts: ModerationOpts
 }) {
   const t = useTheme()
-  if (shouldFilterNotif(notif.notification, moderationOpts)) {
+  const hideFollowNotifications = useHideFollowNotifications()
+  if (
+    shouldFilterNotif(
+      notif.notification,
+      moderationOpts,
+      hideFollowNotifications,
+    )
+  ) {
     return (
       <P style={[t.atoms.bg_contrast_25, a.px_lg, a.py_md]}>
         Filtered from the feed
