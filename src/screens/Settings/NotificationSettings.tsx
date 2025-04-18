@@ -2,11 +2,7 @@ import {Text} from 'react-native'
 import {msg, Trans} from '@lingui/macro'
 import {useLingui} from '@lingui/react'
 
-import {AllNavigatorParams, NativeStackScreenProps} from '#/lib/routes/types'
-import {
-  useHideFollowNotifications,
-  useSetHideFollowNotifications,
-} from '#/state/preferences/hide-follow-notifications'
+import {type AllNavigatorParams, type NativeStackScreenProps} from '#/lib/routes/types'
 import {useNotificationFeedQuery} from '#/state/queries/notifications/feed'
 import {useNotificationSettingsMutation} from '#/state/queries/notifications/settings'
 import {atoms as a} from '#/alf'
@@ -36,9 +32,6 @@ export function NotificationSettingsScreen({}: Props) {
     isPending: isMutationPending,
     variables,
   } = useNotificationSettingsMutation()
-
-  const hideFollowNotifications = useHideFollowNotifications()
-  const setHideFollowNotifications = useSetHideFollowNotifications()
 
   const priority = isMutationPending
     ? variables[0] === 'enabled'
@@ -70,17 +63,6 @@ export function NotificationSettingsScreen({}: Props) {
               <SettingsList.ItemText>
                 <Trans>Notification filters</Trans>
               </SettingsList.ItemText>
-              <Toggle.Item
-                name="hide_follow_notifications"
-                label={_(msg`Hide follow notifications`)}
-                value={hideFollowNotifications ?? false}
-                onChange={value => setHideFollowNotifications(value)}
-                style={[a.w_full]}>
-                <Toggle.LabelText style={[a.flex_1]}>
-                  <Trans>Hide follow notifications</Trans>
-                </Toggle.LabelText>
-                <Toggle.Platform />
-              </Toggle.Item>
               <Toggle.Group
                 label={_(msg`Priority notifications`)}
                 type="checkbox"
