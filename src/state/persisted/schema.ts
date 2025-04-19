@@ -192,6 +192,7 @@ export const defaults: Schema = {
   noAppLabelers: false,
   noDiscoverFallback: false,
   repostCarouselEnabled: false,
+  hideFollowNotifications: false,
 }
 
 export function tryParse(rawData: string): Schema | undefined {

@@ -72,7 +72,7 @@ export function NotificationSettingsScreen({}: Props) {
                 <Toggle.Item
                   name="enabled"
                   label={_(msg`Enable priority notifications`)}
-                  style={[a.flex_1, a.justify_between, a.pt_sm]}>
+                  style={[a.flex_1, a.justify_between]}>
                   <Toggle.LabelText>
                     <Trans>Enable priority notifications</Trans>
                   </Toggle.LabelText>
