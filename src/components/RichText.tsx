@@ -1,5 +1,5 @@
 import React from 'react'
-import {TextStyle} from 'react-native'
+import {TextStyle, Text as RNText} from 'react-native'
 import {$Typed, AppBskyRichtextFacet, RichText as RichTextAPI} from '@atproto/api'
 
 import {toShortUrl} from '#/lib/strings/url-helpers'
@@ -176,17 +176,18 @@ export function RichText({
         const emoji: BluemojiFeature = feat as BluemojiFeature
         els.push(
           // Abusing an SVG in this way is not in any way ideal, but
-          // AFAIK, <Image> doesn't let you inline it. So this will have to suffice
+          // AFAIK, <Image> doesn't let you inline it. So this will have to suffice    
           <Svg
             key={key}
-            viewBox="0 0 24 24"
-            style={{marginBottom: -6, userSelect: 'text', cursor: 'auto'}}
-            width="24"
-            height="24"
+            viewBox="0 0 14 14"
+            style={{userSelect: 'text', cursor: 'auto'}}
+            width={(flattenedStyle.fontSize ?? 16) * 1.175}
+            height={(flattenedStyle.fontSize ?? 16) * 1.175}
+            translateY={(flattenedStyle.fontSize ?? 0) * 0.25}
             title={emoji.name}
             accessible
             accessibilityLabel={emoji.name + " " + emoji.alt}>
-              <SvgImage href={emoji.uri} width="24" height="24" />
+              <SvgImage href={emoji.uri} width="14" height="14" />
           </Svg>
         );
       }
