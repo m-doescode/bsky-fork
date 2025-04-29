@@ -35,9 +35,9 @@ export function BluemojiEmoji({
       <Svg
         viewBox="0 0 14 14"
         style={{userSelect: 'text', cursor: 'auto'}}
-        width={((style.fontSize ?? 16) * 26) / 20}
-        height={((style.fontSize ?? 16) * 26) / 20}
-        translateY={((style.fontSize ?? 16) * 6.5) / 20}
+        width={((style.fontSize ?? 16) * 23.5) / 20}
+        height={((style.fontSize ?? 16) * 23.5) / 20}
+        translateY={((style.fontSize ?? 16) * 5) / 20}
         title={emoji.name}
         accessible
         accessibilityLabel={emoji.name}
