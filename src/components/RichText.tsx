@@ -1,6 +1,6 @@
 import React from 'react'
-import {TextStyle, Text as RNText} from 'react-native'
-import {$Typed, AppBskyRichtextFacet, RichText as RichTextAPI} from '@atproto/api'
+import {TextStyle} from 'react-native'
+import {AppBskyRichtextFacet, RichText as RichTextAPI} from '@atproto/api'
 
 import {toShortUrl} from '#/lib/strings/url-helpers'
 import {atoms as a, flatten, TextStyleProp} from '#/alf'
@@ -9,7 +9,7 @@ import {InlineLinkText, LinkProps} from '#/components/Link'
 import {ProfileHoverCard} from '#/components/ProfileHoverCard'
 import {RichTextTag} from '#/components/RichTextTag'
 import {Text, TextProps} from '#/components/Typography'
-import {Svg, Image as SvgImage} from 'react-native-svg'
+import {BluemojiEmoji, ExtendedFacet} from './BluemojiEmoji'
 
 const WORD_WRAP = {wordWrap: 1}
 
@@ -26,19 +26,6 @@ export type RichTextProps = TextStyleProp &
     emojiMultiplier?: number
     shouldProxyLinks?: boolean
   }
-
-// deer
-interface BluemojiFeature {
-  $type?: 'blue.moji.richtext.facet#bluemoji'
-  uri: string
-  name: string
-  alt: string
-};
-
-type ExtendedFacet = AppBskyRichtextFacet.Main | {
-  $type: 'blue.moji.richtext.facet'
-  features: $Typed<BluemojiFeature>[]
-};
 
 export function RichText({
   testID,
@@ -167,30 +154,16 @@ export function RichText({
           authorHandle={authorHandle}
         />,
       )
-    } else if ((segment.facet as ExtendedFacet)?.$type == "blue.moji.richtext.facet") {
-      const facet: ExtendedFacet = segment.facet as ExtendedFacet
-
-      // Add each emoji
-      for (const feat of facet.features) {
-        if (feat.$type != 'blue.moji.richtext.facet#bluemoji') continue
-        const emoji: BluemojiFeature = feat as BluemojiFeature
-        els.push(
-          // Abusing an SVG in this way is not in any way ideal, but
-          // AFAIK, <Image> doesn't let you inline it. So this will have to suffice    
-          <Svg
-            key={key}
-            viewBox="0 0 14 14"
-            style={{userSelect: 'text', cursor: 'auto'}}
-            width={(flattenedStyle.fontSize ?? 16) * 1.175}
-            height={(flattenedStyle.fontSize ?? 16) * 1.175}
-            translateY={(flattenedStyle.fontSize ?? 0) * 0.25}
-            title={emoji.name}
-            accessible
-            accessibilityLabel={emoji.name + " " + emoji.alt}>
-              <SvgImage href={emoji.uri} width="14" height="14" />
-          </Svg>
-        );
-      }
+    } else if (
+      (segment.facet as ExtendedFacet)?.$type === 'blue.moji.richtext.facet'
+    ) {
+      els.push(
+        <BluemojiEmoji
+          key={key}
+          style={flattenedStyle}
+          facet={segment.facet as ExtendedFacet}
+        />,
+      )
     } else {
       els.push(segment.text)
     }
