@@ -392,6 +392,29 @@ let PostDropdownMenuItems = ({
     })
   }, [isPinned, pinPostMutate, postCid, postUri])
 
+  // HUGE thanks to juli.ee and mary.my.id for pdsls and atcute/identity-resolver respectively
+  // as a reference for this code
+  const fetchPds = useCallback(async () => {
+    const did = post.author.did
+    let doc
+    if (did.startsWith('did:web:')) {
+      const hostPart = did.slice(8)
+      doc = await fetch(`https://${hostPart}/.well-known/did.json`)
+        .then(r => r.json())
+        .catch(() => null)
+    } else if (did.startsWith('did:plc')) {
+      doc = await fetch(`https://plc.directory/${encodeURIComponent(did)}`)
+        .then(r => r.json())
+        .catch(() => null)
+    }
+    if (!doc) return null
+    const pds = doc.service.find(
+      (service: {type: string}) => service.type === 'AtprotoPersonalDataServer',
+    )
+    if (!pds) return null
+    return pds.serviceEndpoint
+  }, [post])
+
   const onPressDownloadVideo = useCallback(async () => {
     if (post.embed?.$type !== 'app.bsky.embed.video#view') return
     const video = post.embed as AppBskyEmbedVideo.View
@@ -409,7 +432,7 @@ let PostDropdownMenuItems = ({
 
     if (success) Toast.show('Video downloaded', 'check')
     else Toast.show('Failed to download video', 'xmark')
-  }, [post])
+  }, [post, fetchPds])
 
   const onPressDownloadGif = useCallback(async () => {
     if (post.embed?.$type !== 'app.bsky.embed.external#view') return
