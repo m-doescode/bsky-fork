@@ -6,8 +6,8 @@ import {msg} from '@lingui/macro'
 import {useLingui} from '@lingui/react'
 
 import {isTouchDevice} from '#/lib/browser'
-import {atoms as a,useTheme} from '#/alf'
-import {Button} from '#/components/Button'
+import {atoms as a, useTheme} from '#/alf'
+import {Button, ButtonIcon, ButtonText} from '#/components/Button'
 import {
   Star_Filled_Corner0_Rounded as FavoriteFilled,
   Star_Stroke2_Corner0_Rounded as FavoriteOutline,
@@ -316,7 +316,7 @@ let Card = (props: {
         t.atoms.border_contrast_low,
         t.atoms.shadow_lg,
         {
-          width: 300,
+          width: 350,
         },
       ]}>
       <Inner {...props} />
@@ -335,7 +335,6 @@ function Inner({
   description: string
 }) {
   const _uri = uri
-  const _description = description
 
   const t = useTheme()
   const {_} = useLingui()
@@ -347,33 +346,39 @@ function Inner({
   }
 
   return (
-    <View style={[a.flex_row, a.justify_between, a.align_start]}>
-      <View style={[a.flex_row, a.align_start]}>
-        <Text
-          style={[
-            a.text_sm,
-            a.leading_snug,
-            a.flex_wrap,
-            t.atoms.text_contrast_medium,
-          ]}>
-          {_(msg`Bluemoji`)}
-          {' • '}
-        </Text>
-        <Text style={[a.text_sm, a.leading_snug, a.flex_wrap, t.atoms.text]}>
-          {name}
-        </Text>
+    <View style={[a.flex_col]}>
+      <View style={[a.flex_row, a.justify_between, a.align_start, a.pb_sm]}>
+        <View style={[a.flex_col, a.align_start]}>
+          <Text style={[a.text_md, a.leading_snug, a.flex_wrap, t.atoms.text]}>
+            {name}
+          </Text>
+          <Text
+            style={[
+              a.text_sm,
+              a.leading_snug,
+              a.flex_wrap,
+              t.atoms.text_contrast_medium,
+            ]}>
+            {_(msg`Bluemoji`)}
+          </Text>
+        </View>
+        <Button
+          size="small"
+          color={isFavorited ? 'secondary' : 'primary'}
+          variant="solid"
+          label={isFavorited ? _(msg`Favorited`) : _(msg`Add to favorites`)}
+          style={[a.rounded_full]}
+          onPress={onPress}>
+          <ButtonIcon
+            position="left"
+            icon={isFavorited ? FavoriteFilled : FavoriteOutline}
+          />
+          <ButtonText>
+            {isFavorited ? _(msg`Favorited`) : _(msg`Add to favorites`)}
+          </ButtonText>
+        </Button>
       </View>
-
-      <Button
-        style={[a.flex_row, a.align_center, a.gap_xs, a.pt_2xs]}
-        onPress={onPress}
-        label={isFavorited ? _(msg`Favorited`) : _(msg`Add to favorites`)}>
-        {isFavorited ? <FavoriteFilled /> : <FavoriteOutline />}
-        <Text
-          style={[a.text_sm, a.leading_snug, {color: t.palette.primary_500}]}>
-          {isFavorited ? _(msg`Favorited`) : _(msg`Add to favorites`)}
-        </Text>
-      </Button>
+      <Text style={[a.text_sm, a.leading_snug]}>{description}</Text>
     </View>
   )
 }

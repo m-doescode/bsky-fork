@@ -3,8 +3,8 @@ import {View} from 'react-native'
 import {msg} from '@lingui/macro'
 import {useLingui} from '@lingui/react'
 
-import {atoms as a,useTheme} from '#/alf'
-import {Button} from '#/components/Button'
+import {atoms as a, useTheme} from '#/alf'
+import {Button, ButtonIcon, ButtonText} from '#/components/Button'
 import * as Dialog from '#/components/Dialog'
 import {
   Star_Filled_Corner0_Rounded as FavoriteFilled,
@@ -86,7 +86,9 @@ function Inner({
     <View style={[a.flex_col, a.justify_between]}>
       <View style={[a.flex_row, a.justify_between, a.align_start, a.pb_sm]}>
         <View style={[a.flex_col, a.align_start]}>
-          <Text style={[a.font_bold, a.text_xl]}>{name}</Text>
+          <Text style={[a.text_lg, a.leading_snug, a.flex_wrap, t.atoms.text]}>
+            {name}
+          </Text>
           <Text
             style={[
               a.text_sm,
@@ -94,22 +96,26 @@ function Inner({
               a.flex_wrap,
               t.atoms.text_contrast_medium,
             ]}>
-            Bluemoji
+            {_(msg`Bluemoji`)}
           </Text>
         </View>
-
         <Button
-          style={[a.flex_row, a.align_center, a.gap_xs, a.pt_2xs]}
-          onPress={onPress}
-          label={isFavorited ? _(msg`Favorited`) : _(msg`Add to favorites`)}>
-          {isFavorited ? <FavoriteFilled /> : <FavoriteOutline />}
-          <Text
-            style={[a.text_sm, a.leading_snug, {color: t.palette.primary_500}]}>
+          size="small"
+          color={isFavorited ? 'secondary' : 'primary'}
+          variant="solid"
+          label={isFavorited ? _(msg`Favorited`) : _(msg`Add to favorites`)}
+          style={[a.rounded_full]}
+          onPress={onPress}>
+          <ButtonIcon
+            position="left"
+            icon={isFavorited ? FavoriteFilled : FavoriteOutline}
+          />
+          <ButtonText>
             {isFavorited ? _(msg`Favorited`) : _(msg`Add to favorites`)}
-          </Text>
+          </ButtonText>
         </Button>
       </View>
-      <Text style={[a.text_md]}>{description}</Text>
+      <Text style={[a.text_sm, a.leading_snug]}>{description}</Text>
     </View>
   )
 }
