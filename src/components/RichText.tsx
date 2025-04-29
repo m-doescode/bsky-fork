@@ -9,7 +9,7 @@ import {InlineLinkText, LinkProps} from '#/components/Link'
 import {ProfileHoverCard} from '#/components/ProfileHoverCard'
 import {RichTextTag} from '#/components/RichTextTag'
 import {Text, TextProps} from '#/components/Typography'
-import {BluemojiEmoji, ExtendedFacet} from './BluemojiEmoji'
+import {BluemojiEmoji, containsBluemoji, ExtendedFacet} from './BluemojiEmoji'
 
 const WORD_WRAP = {wordWrap: 1}
 
@@ -154,9 +154,7 @@ export function RichText({
           authorHandle={authorHandle}
         />,
       )
-    } else if (
-      (segment.facet as ExtendedFacet)?.$type === 'blue.moji.richtext.facet'
-    ) {
+    } else if (containsBluemoji(segment.facet as ExtendedFacet)) {
       els.push(
         <BluemojiEmoji
           key={key}
@@ -164,6 +162,7 @@ export function RichText({
           facet={segment.facet as ExtendedFacet}
         />,
       )
+      console.log('we do the thing')
     } else {
       els.push(segment.text)
     }
