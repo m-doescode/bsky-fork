@@ -1,8 +1,8 @@
 import {useEffect, useState} from 'react'
-import {TextStyle, View} from 'react-native'
+import {type TextStyle, View} from 'react-native'
 import {Image as SvgImage, Svg} from 'react-native-svg'
-import {$Typed, AppBskyRichtextFacet} from '@atproto/api'
-import {SelfLabels} from '@atproto/api/dist/client/types/com/atproto/label/defs'
+import {type $Typed, type AppBskyRichtextFacet} from '@atproto/api'
+import {type SelfLabels} from '@atproto/api/dist/client/types/com/atproto/label/defs'
 import LottieView from 'lottie-react-native'
 
 import {resolvePdsServiceUrl} from '#/state/queries/resolve-identity'
@@ -38,7 +38,6 @@ interface BluemojiFeature {
 export type ExtendedFacet =
   | AppBskyRichtextFacet.Main
   | {
-      $type: 'app.bsky.richtext.facet' | 'blue.moji.richtext.facet' // Legacy facet, should be app.bsky.richtext.facet
       features: ($Typed<LegacyBluemojiFeature> | $Typed<BluemojiFeature>)[]
     }
 
@@ -57,21 +56,17 @@ interface BluemojiRecord {
 
 export function containsBluemoji(facet: ExtendedFacet) {
   if (!facet) return false
-  const isLegacy = facet.$type === 'blue.moji.richtext.facet'
-  // Not sure if more than one feature can be assigned to a single facet in this case. I don't think so, at any rate
-  // TODO: Yes it is possible, if say the bluemoji becomes linked. Fix this before merging
-  if (facet.features.length !== 1) return false
-  const feat = facet.features[0]
+  return (
+    facet.features.find(e => e.$type === 'blue.moji.richtext.facet') !==
+    undefined
+  )
+}
 
-  if (
-    isLegacy
-      ? feat.$type === 'blue.moji.richtext.facet#bluemoji'
-      : feat.$type === 'blue.moji.richtext.facet'
-  ) {
-    return true
-  }
-
-  return false
+function findBluemoji(facet: ExtendedFacet): BluemojiFeature | undefined {
+  if (!facet) return undefined
+  return facet.features.find(e => e.$type === 'blue.moji.richtext.facet') as
+    | BluemojiFeature
+    | undefined
 }
 
 function renderStaticImage(
@@ -211,24 +206,8 @@ export function BluemojiEmoji({
   style: TextStyle
   facet: ExtendedFacet
 }) {
-  if (facet.features.length !== 1) return <></>
-
-  // Handle case of legacy bluemoji
-  if (facet.$type === 'blue.moji.richtext.facet') {
-    const feat = facet.features[0]
-    if (feat.$type !== 'blue.moji.richtext.facet#bluemoji') return <></>
-
-    return (
-      <BluemojiHoverCard name={feat.name} uri={feat.uri} description={feat.alt}>
-        {renderStaticImage(style, feat.name, feat.alt, feat.uri)}
-      </BluemojiHoverCard>
-    )
-  }
-
-  // Add emoji
-  const feat = facet.features[0]
-  if (feat.$type !== 'blue.moji.richtext.facet') return <></>
-  const emoji: BluemojiFeature = feat as BluemojiFeature
+  const emoji: BluemojiFeature | undefined = findBluemoji(facet)
+  if (!emoji) return <></>
 
   // Note: For some reason, ALL emojis get a lottie field, valid or otherwise
   // for pngs and webps etc., this is just set to a base64 encoded version of the png
