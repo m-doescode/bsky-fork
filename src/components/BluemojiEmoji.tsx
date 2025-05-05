@@ -69,17 +69,18 @@ function findBluemoji(facet: ExtendedFacet): BluemojiFeature | undefined {
     | undefined
 }
 
-function renderStaticImage(
-  style: TextStyle,
-  name: string,
-  alt: string,
-  uri: string,
-) {
-  // Abusing an SVG in this way is not in any way ideal, but
-  // AFAIK, <Image> doesn't let you inline it. So this will have to suffice
+function BluemojiPlaceholder({
+  style,
+  name,
+  alt,
+}: {
+  style: TextStyle
+  name: string
+  alt: string
+}) {
   return (
     <Svg
-      viewBox="0 0 14 14"
+      viewBox="0 0 100 100"
       style={{userSelect: 'text', cursor: 'auto'}}
       width={((style.fontSize ?? 16) * 23.5) / 20}
       height={((style.fontSize ?? 16) * 23.5) / 20}
@@ -88,7 +89,26 @@ function renderStaticImage(
       accessible
       accessibilityLabel={name}
       accessibilityHint={alt}>
-      <SvgImage href={uri} width="14" height="14" />
+      <defs>
+        <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+          <stop offset="40%" stopColor="#ffffff" stopOpacity="0.4" />
+          <stop offset="60%" stopColor="#ffffff" stopOpacity="0.4" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <rect width="100" height="100" fill="url(#gradient)">
+        <animateTransform
+          attributeName="transform"
+          attributeType="XML"
+          type="translate"
+          dur="1s"
+          values="0 -50;0 50;0 -50"
+          calcMode="spline"
+          keySplines="0.4 0 0.2 1; 0.4 0 0.2 1"
+          repeatCount="indefinite"
+        />
+      </rect>
     </Svg>
   )
 }
@@ -105,6 +125,7 @@ function BluemojiStaticInner({
   style: TextStyle
 }) {
   const [emojiUri, setEmojiUri] = useState<string>()
+  const [isLoaded, setLoaded] = useState<boolean>(false)
 
   useEffect(() => {
     async function fetchEmojiUri() {
@@ -122,18 +143,48 @@ function BluemojiStaticInner({
       }
 
       setEmojiUri(uri)
-      console.log(uri)
     }
 
     fetchEmojiUri()
   }, [emoji])
 
+  // Abusing an SVG in this way is not in any way ideal, but
+  // AFAIK, <Image> doesn't let you inline it. So this will have to suffice
   return (
     <BluemojiHoverCard
       name={emoji.name}
       uri={emojiUri!}
       description={emoji.alt}>
-      {renderStaticImage(style, emoji.name, emoji.alt, emojiUri!)}
+      <>
+        <Svg
+          viewBox="0 0 14 14"
+          style={{
+            userSelect: 'text',
+            cursor: 'auto',
+            display: isLoaded ? undefined : 'none',
+          }}
+          width={((style.fontSize ?? 16) * 23.5) / 20}
+          height={((style.fontSize ?? 16) * 23.5) / 20}
+          translateY={((style.fontSize ?? 16) * 5) / 20}
+          title={emoji.name}
+          accessible
+          accessibilityLabel={emoji.name}
+          accessibilityHint={emoji.alt}>
+          <SvgImage
+            href={emojiUri}
+            width="14"
+            height="14"
+            onLoad={() => setLoaded(true)}
+          />
+        </Svg>
+        {!isLoaded && (
+          <BluemojiPlaceholder
+            style={style}
+            name={emoji.name}
+            alt={emoji.alt}
+          />
+        )}
+      </>
     </BluemojiHoverCard>
   )
 }
@@ -159,6 +210,7 @@ function BluemojiLottieInner({
 }) {
   const agent = useAgent()
   const [emojiSource, setEmojiSource] = useState<string>()
+  const [isLoaded, setLoaded] = useState<boolean>(false)
 
   useEffect(() => {
     async function fetchEmojiSource() {
@@ -191,9 +243,29 @@ function BluemojiLottieInner({
         style={{
           width: ((style.fontSize ?? 16) * 23.5) / 20,
           height: ((style.fontSize ?? 16) * 23.5) / 20,
-          transform: `translateY(${((style.fontSize ?? 16) * 5) / 20}px)`,
         }}>
-        {emojiSource && <LottieView source={emojiSource} autoPlay loop />}
+        {emojiSource && (
+          <View
+            style={{
+              width: '100%',
+              height: '100%',
+              transform: `translateY(${((style.fontSize ?? 16) * 5) / 20}px)`,
+            }}>
+            <LottieView
+              source={emojiSource}
+              autoPlay
+              loop
+              onAnimationLoaded={() => setLoaded(true)}
+            />
+          </View>
+        )}
+        {!isLoaded && (
+          <BluemojiPlaceholder
+            style={style}
+            name={emoji.name}
+            alt={emoji.alt}
+          />
+        )}
       </View>
     </BluemojiHoverCard>
   )
